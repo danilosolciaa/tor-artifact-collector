@@ -1,0 +1,61 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+
+# ── Testing ────────────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+tmp_pytest_run_*/
+
+# ── IDE ────────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Tool output (generated at runtime, not source) ────────────────────────────
+output/
+*.log
+*.sha256
+demo_timeline.json
+demo_out.json
+tor_forensic_timeline.json
+
+# Keep example JSON committed, ignore everything else at root
+*.json
+!examples/*.json
+!pyproject.toml
+
+# ── Forensic artifact files (never commit real evidence) ──────────────────────
+*.evtx
+*.pf
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+NTUSER.DAT
+*.DAT
+
+# ── Session / scratch files ────────────────────────────────────────────────────
+NEXT_SESSION.md
+tmpclaude-*
+fix_tmp.py
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
