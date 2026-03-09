@@ -371,23 +371,6 @@ These are useful when preconfigured, but poor assumptions for ordinary home-user
 
 ---
 
-## Dataset Readiness Changes (Internship Scope)
-
-For building realistic E01 demo images without overengineering:
-
-- Use GUI launch via desktop shortcut (`.lnk`) so UserAssist **and Jump List** entries are generated.
-- Spread activity across multiple sessions with clear time gaps.
-- Create real WAL deletion scenarios: visit `.onion`, delete from history UI, then force-close the browser.
-- Generate Chromium `.onion` attempts in Chrome and Edge.
-- Add non-Tor browsing traffic as background noise to test filtering quality.
-- Use only basic user deletion behavior, not advanced anti-forensics.
-- Validate artifacts before acquisition (UserAssist, `places.sqlite-wal`, Prefetch, EVTX policy, Jump Lists).
-- Build three image stages: baseline (A), active usage (B), post-deletion (C).
-- Enable VSS on the demo VM before session B so shadow copies of phase-B `places.sqlite` survive into phase C — this creates a realistic VSS recovery scenario.
-- Keep implementation practical for internship scope; skip deep carving and advanced memory work.
-
----
-
 ## License
 
 MIT License - See `LICENSE` for details.
