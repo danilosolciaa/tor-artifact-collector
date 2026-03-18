@@ -1,4 +1,4 @@
-# ── Python ────────────────────────────────────────────────────────────────────
+# ── Python 
 __pycache__/
 *.py[cod]
 *$py.class
@@ -9,27 +9,29 @@ dist/
 *.egg
 .eggs/
 
-# ── Virtual environments ───────────────────────────────────────────────────────
+# ── Virtual environments 
 venv/
 .venv/
 env/
 ENV/
 
-# ── Testing ────────────────────────────────────────────────────────────────────
+# ── Testing 
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
 tmp_pytest_run_*/
+.tmp_pytest/
 
-# ── IDE ────────────────────────────────────────────────────────────────────────
+
+# ── IDE 
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# ── Tool output (generated at runtime, not source) ────────────────────────────
+# ── Tool output 
 output/
 *.log
 *.sha256
@@ -42,7 +44,7 @@ tor_forensic_timeline.json
 !examples/*.json
 !pyproject.toml
 
-# ── Forensic artifact files (never commit real evidence) ──────────────────────
+# ── Forensic artifact files     
 *.evtx
 *.pf
 *.sqlite
@@ -51,11 +53,9 @@ tor_forensic_timeline.json
 NTUSER.DAT
 *.DAT
 
-# ── Session / scratch files ────────────────────────────────────────────────────
-NEXT_SESSION.md
-tmpclaude-*
+
 fix_tmp.py
 
-# ── OS ────────────────────────────────────────────────────────────────────────
+# ── OS 
 .DS_Store
 Thumbs.db

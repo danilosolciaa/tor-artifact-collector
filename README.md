@@ -24,16 +24,13 @@ The tool extracts Tor Browser evidence from nine Windows sources and correlates 
 
 ### Why These Nine Sources?
 
-The selection is driven by one principle: **no single user-level cleanup action eliminates evidence across all sources simultaneously.**
+The selection is driven by the idea of creating a system that would mitigate user-level cleanup, in a way that no singular action could eliminate evidence across all sources simultaneously.
 
-**What "Clear Recent History" in Tor Browser actually clears:**
-Rows in `places.sqlite`. It does not touch the WAL file; history deleted just before a force-kill of the browser may still survive in `places.sqlite-wal` as uncheckpointed frames. UserAssist, Prefetch, EVTX, and Jump Lists are unaffected.
+**What "Clear Recent History" in Tor Browser deletes:**
+Rows in `places.sqlite`; It does not touch the WAL file; history deleted just before a force-kill of the browser may still survive in `places.sqlite-wal` as uncheckpointed frames. UserAssist, Prefetch, EVTX, and Jump Lists are unaffected.
 
 **What uninstalling Tor Browser clears:**
 The application files on disk. The Windows Registry is not modified by uninstallers, so UserAssist entries persist with the original executable path even after the software is gone. `C:\Windows\Prefetch\TOR.EXE-*.pf` is also untouched because Prefetch is managed by Windows, not by the application. Jump List entries in `AutomaticDestinations` are managed by Windows Explorer and also survive uninstallation.
-
-**What "Clear browsing data" in Chrome/Edge clears:**
-Only those browsers' History databases. It has no effect on Tor Browser's SQLite files, UserAssist, Prefetch, EVTX, or Jump Lists.
 
 **What Volume Shadow Copies can preserve:**
 If VSS was active, a snapshot taken before the user cleared their history may contain the full `places.sqlite` with all visited `.onion` URLs intact. This is the most impactful recovery source for browsing history: it operates independently of what the user deleted at the application level.
@@ -45,15 +42,15 @@ If VSS was active, a snapshot taken before the user cleared their history may co
 - Volume Shadow Copies: deleting all VSS snapshots requires `vssadmin delete shadows` as Administrator.
 - Jump Lists: stored under the user profile but not cleaned by browser uninstallers.
 
-In practice, a non-technical user who uninstalls Tor Browser and clears browser history still leaves UserAssist entries, Prefetch files, Jump List entries, and sometimes EVTX events and VSS snapshots intact. The tool is designed to surface that residual evidence.
+In practice, a non-technical user who uninstalls Tor Browser and clears browser history still leaves UserAssist entries, Prefetch files, Jump List entries, and sometimes EVTX events and VSS snapshots intact. The tool is designed to surface residual evidence.
 
-The important split is this:
+The important split is:
 - The tool is strongest for proving **execution**: Tor Browser ran, roughly when, and often how many times.
-- The tool is weaker for proving **which specific sites were visited**, because browsing-history sources are easier to wipe — though VSS recovery significantly improves the outlook when shadow copies are available.
+- The tool is weaker for proving **which specific sites were visited**, because browsing-history sources are easier to wipe — though VSS recovery significantly improves this.
 
 ### Chain of Custody: Source File Hashing
 
-Before reading any artifact file, the tool computes its SHA-256 hash and records it in the output under `artifact_hashes`. This documents the state of each source at collection time, a standard requirement for forensic evidence handling.
+Before reading any artifact file, the tool computes its SHA-256 hash and records it in the output under `artifact_hashes`. This documents the state of each source at collection time..
 
 ```json
 "artifact_hashes": {
@@ -79,7 +76,7 @@ pip install olefile
 
 ### Fastest Commands
 
-**See the tool working without real evidence:**
+**Using the tool without real evidence:**
 
 ```bash
 python -m src.cli --demo --output demo_timeline.json --pretty --stats
@@ -93,12 +90,12 @@ This uses synthetic artifact input, then runs the same normalization, correlatio
 python -m src.cli --mount "E:\" --output timeline.json --pretty
 ```
 
-This scans the mounted image, auto-discovers supported artifacts, and writes one timeline file.
+Scans the mounted image, auto-discovers supported artifacts, and writes one timeline file.
 
 **Run against three mounted snapshots in one command:**
 
 ```bash
-python -m src.cli \
+python -m src.cli 
     --snapshot A=E:\ \
     --snapshot B=F:\ \
     --snapshot C=G:\ \
@@ -113,7 +110,7 @@ This produces:
 - `output/phase_c.json`
 - one `.sha256` sidecar per JSON output
 
-### Before You Collect - Verify Artifacts Exist
+### Verifying Artifacts Exist before Collection
 
 ```bash
 python -m src.cli --verify
@@ -121,7 +118,7 @@ python -m src.cli --verify
 
 This prints PowerShell one-liners to confirm EVTX audit policy, Prefetch files, browser databases, registry keys, Jump Lists, and VSS snapshots are present before running the full collection.
 
-### Real Usage
+### Usage
 
 **Mounted disk image, single snapshot:**
 
@@ -195,7 +192,7 @@ Each extractor module in `src/extractors/` handles one artifact type:
 - `registry.py` - parses offline `NTUSER.DAT` with `yarp` and live UserAssist via `winreg`
 - `places_sqlite.py` - queries Firefox/Tor Browser SQLite databases for `.onion` URLs
 - `places_wal.py` - parses WAL headers/frames and recovers deleted `.onion` URLs
-- `chrome_history.py` - finds `.onion` URLs in Chrome, Edge, and Brave
+- `chrome_history.py` - finds `.onion` URLs in Chrome, Edge, and Brave (for malicious intent detection)
 - `prefetch.py` - parses Windows Prefetch files for execution evidence
 - `evtx.py` - extracts Event ID 4688 (process creation) from `Security.evtx`
 - `jump_lists.py` - parses `.automaticDestinations-ms` OLE documents for Tor Browser launch entries; falls back to binary carving when `olefile` is not available
@@ -225,11 +222,11 @@ The correlation engine in `src/correlation.py` is intentionally conservative:
 
 Events receive confidence levels based on:
 - number of independent sources
-- whether precise timestamps actually align within tolerance
+- whether precise timestamps align 
 - whether multiple sources agree on run count
 - whether the artifact is active or recovered from deleted data
 
-This scoring is deliberately simple. It is meant to help triage findings, not to overclaim mathematical certainty.
+This scoring is deliberately simple. It is meant to help triage findings, not to claim judiciary certainty.
 
 ---
 
@@ -333,7 +330,7 @@ pytest tests/test_extractors_integration.py -v -o "addopts="
 
 ## Limitations and Future Work
 
-This is a learning project, not a polished forensic suite. Current limitations:
+This is a learning project, not a polished forensic tool; There are several limitations to be acknowledged:
 
 **Browsing Evidence Is Fragile**: `places.sqlite` and Chromium History are erased by standard browser history clears. The execution-evidence sources (UserAssist, Prefetch, EVTX, Jump Lists) are less fragile. VSS recovery can partially offset this for browsing history, but only if shadow copies existed before the deletion.
 
@@ -347,16 +344,16 @@ This is a learning project, not a polished forensic suite. Current limitations:
 
 **VSS Scope**: VSS enumeration only works on live Windows systems and requires Administrator. Accessing shadow copies from a mounted forensic image directly would require `libvshadow` or similar — not implemented here.
 
-**No Memory Forensics**: This project only handles disk artifacts. Memory analysis would add more evidence but is out of scope here.
+**No Memory Forensics**: This project only handles disk artifacts. Memory analysis would add more evidence but is out of scope and more complex.
 
 **Chrome WAL Recovery**: Not implemented. Chromium flushes more aggressively than Firefox, so recovery is less reliable.
 
-**Why OS-level network telemetry is not treated as baseline evidence:**
+**Why OS-level network telemetry  was considered but not adopted:**
 - Event ID 4688 only exists if Audit Process Creation was enabled before activity.
 - WFP events (5156/5157/5158) depend on Filtering Platform auditing, which is often off.
 - Windows Firewall logs only help if firewall logging was enabled beforehand.
 
-These are useful when preconfigured, but poor assumptions for ordinary home-user systems.
+These are useful when preconfigured, but poor assumptions for user systems.
 
 ### What I Would Add With More Time
 
@@ -373,4 +370,4 @@ These are useful when preconfigured, but poor assumptions for ordinary home-user
 
 ## License
 
-MIT License - See `LICENSE` for details.
+MIT License.
